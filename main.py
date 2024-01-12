@@ -1,14 +1,29 @@
+import json
 import tkinter as tk
 from tkinter import messagebox
 from gotify import send_gotify_message
 
 def onClick():
+    with open("connection.json", "r") as file:
+        data = json.load(file)
+    url = entry_url.get()
+    token = entry_token.get()
+    if not url:
+        url = data["URL"]
+    if not token:
+        token = data["Token"]
     try:
         send_gotify_message(
             entry_title.get(),entry_message.get(),
-            entry_url.get(),entry_token.get())
+            url,token)
+        if entry_url.get():
+           data["URL"] = entry_url.get()
+        if entry_token.get():
+           data["Token"] = entry_token.get()
         entry_title.delete(0, tk.END)
         entry_message.delete(0, tk.END)
+        with open("connection.json", "w") as file:
+            json.dump(data, file)
     except:
         messagebox.showinfo("Alert",
                             "Please, provide correct server-client protocol \
