@@ -4,32 +4,41 @@ from tkinter import messagebox
 from gotify import send_gotify_message
 
 def onClick():
-    with open("connection.json", "r") as file:
-        data = json.load(file)
-    url = entry_url.get()
-    token = entry_token.get()
-    if not url:
-        url = data["URL"]
-    if not token:
-        token = data["Token"]
     try:
-        send_gotify_message(
-            entry_title.get(),entry_message.get(),
-            url,token)
-        if entry_url.get():
-           data["URL"] = entry_url.get()
-        if entry_token.get():
-           data["Token"] = entry_token.get()
-        entry_title.delete(0, tk.END)
-        entry_message.delete(0, tk.END)
+        file = open("connection.json", "r")
+        data = json.load(file)
+        url = entry_url.get()
+        token = entry_token.get()
+        if not url:
+            url = data["URL"]
+        if not token:
+            token = data["Token"]
+        try:
+            send_gotify_message(
+                entry_title.get(),entry_message.get(),
+                url,token)
+            if entry_url.get():
+               data["URL"] = entry_url.get()
+            if entry_token.get():
+               data["Token"] = entry_token.get()
+            entry_title.delete(0, tk.END)
+            entry_message.delete(0, tk.END)
+            with open("connection.json", "w") as file:
+                json.dump(data, file)
+        except:
+            messagebox.showinfo("Alert",
+                                "Please, provide correct server-client protocol \
+                                (i.e., http), IP address and protocol used by \
+                                Gotify server for the URL section, and the correct \
+                            token for the last section.")
+    except FileNotFoundError:
+        messagebox.showerror('File not found!', 'A new connection.json file \
+                             will be created to store the default configuration.')
+        data = {"URL":"http://192.168.88.2:90","Token":"AXMOOpzeOEpRMJd"}
         with open("connection.json", "w") as file:
             json.dump(data, file)
-    except:
-        messagebox.showinfo("Alert",
-                            "Please, provide correct server-client protocol \
-                            (i.e., http), IP address and protocol used by \
-                            Gotify server for the URL section, and the correct \
-                        token for the last section.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
 root = tk.Tk()
 
